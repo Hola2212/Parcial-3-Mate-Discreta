@@ -1,0 +1,15 @@
+DECLARACIÓN DE USO DE INTELIGENCIA ARTIFICIAL
+
+Se utilizó ChatGPT (OpenAI), mediante Codex, el 12 de noviembre de 2026 como
+apoyo para diseñar y generar la interfaz gráfica en Python con tkinter y ttk.
+El alcance incluyó el login de demostración, la navegación entre pantallas,
+los formularios, las validaciones básicas de formato, la presentación de
+resultados y los puntos de integración con un futuro módulo matemático.
+
+La asistencia descrita no incluyó la implementación de primalidad, máximo
+común divisor, inverso modular, exponenciación modular ni operaciones RSA.
+Estas funcionalidades no están implementadas en esta versión.
+
+Referencia sugerida:
+OpenAI. (2026). ChatGPT - CODEX [Herramienta de inteligencia artificial generativa].
+https://chatgpt.com/
