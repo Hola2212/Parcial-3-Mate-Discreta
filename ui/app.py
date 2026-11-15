@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from contracts import PendingRSAService
+from users import DemoUser, credentials_help
 from ui import theme
 from ui.screens import InfoScreen, LoginScreen, OperationScreen
 from ui.widgets import DetailWindow
@@ -13,8 +14,13 @@ class RSAApp(tk.Tk):
         super().__init__()
         self.service = service if service is not None else PendingRSAService()
         self.title("RSA LAB | Matemática Discreta")
-        self.geometry("1120x780")
-        self.minsize(760, 520)
+        width = int(self.winfo_screenwidth() * 0.8)
+        height = int(self.winfo_screenheight() * 0.8)
+        x = (self.winfo_screenwidth() - width) // 2
+        y = (self.winfo_screenheight() - height) // 2
+        self.geometry(f"{width}x{height}+{x}+{y}")
+        self.minsize(min(700, width), min(460, height))
+        self.resizable(True, True)
         theme.configure_theme(self)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -25,12 +31,14 @@ class RSAApp(tk.Tk):
         self.detail_window = None
         self.detail_owner = None
         self.login = None
+        self.current_user = None
         self.shell = None
         self.screens = {}
         self.show_login()
 
     def show_login(self):
         self.close_details()
+        self.current_user = None
         if self.shell is not None:
             self.shell.destroy()
             self.shell = None
@@ -39,7 +47,8 @@ class RSAApp(tk.Tk):
         self.login.grid(row=0, column=0, sticky="nsew")
         self.after_idle(self.login.username.focus_set)
 
-    def open_session(self, username):
+    def open_session(self, user: DemoUser):
+        self.current_user = user
         self.login.destroy()
         self.login = None
         self.shell = ttk.Frame(self.container)
@@ -50,11 +59,20 @@ class RSAApp(tk.Tk):
         sidebar.grid(row=0, column=0, sticky="ns")
         sidebar.rowconfigure(7, weight=1)
         ttk.Label(sidebar, text="RSA / LAB", style="Heading.TLabel").grid(sticky="w", pady=(8, 5))
-        ttk.Label(sidebar, text=f"Usuario: {username}", style="Muted.TLabel").grid(sticky="w", pady=(0, 26))
+        self.user_badge = ttk.Label(sidebar, text=f"Usuario: {user.username}\nRol: {user.role}",
+                                    style="Muted.TLabel")
+        self.user_badge.grid(sticky="w", pady=(0, 26))
         content = ttk.Frame(self.shell)
         content.grid(row=0, column=1, sticky="nsew")
-        content.rowconfigure(0, weight=1)
+        content.rowconfigure(1, weight=1)
         content.columnconfigure(0, weight=1)
+        topbar = ttk.Frame(content, padding=(24, 14))
+        topbar.grid(row=0, column=0, sticky="ew")
+        topbar.columnconfigure(0, weight=1)
+        self.breadcrumb = ttk.Label(topbar, text="WORKSPACE / INICIO", style="Accent.TLabel")
+        self.breadcrumb.grid(row=0, column=0, sticky="w")
+        ttk.Label(topbar, text=f"● {user.role.upper()}", foreground=theme.PURPLE
+                  if user.role == "Administrador" else theme.GREEN).grid(row=0, column=1)
         self.screens = {
             "Inicio": InfoScreen(content, "Laboratorio RSA", [
                 ("Explora el proyecto", "Utiliza el menú para ingresar los datos de cada operación y consultar sus resultados."),
@@ -70,14 +88,14 @@ class RSAApp(tk.Tk):
                 ("Relleno y espacios", "Cuando el mensaje tiene longitud impar, RSA debe añadir exactamente un espacio final. Al recuperar el mensaje se retira solo ese relleno. Los espacios originales iniciales, finales y consecutivos se conservan."),
                 ("Validaciones", "Esta interfaz comprueba campos obligatorios y formatos enteros y del cifrado. La validación matemática, la coherencia de L y los caracteres admitidos corresponden al futuro servicio RSA."),
                 ("Detalles del proceso", "La ventana auxiliar mostrará caracteres, ASCII y bloques recibidos del servicio matemático. Sin el servicio conectado permanece vacía."),
-                ("Acceso de demostración", "Usuario: estudiante. Contraseña: rsa2026. El login solo demuestra la navegación; no guarda contraseñas ni proporciona autenticación real."),
+                ("Acceso de demostración", credentials_help() + "\nLas tres cuentas permiten explorar las mismas funciones. El rol identifica la sesión; no se han definido permisos adicionales. Las credenciales son públicas y locales, sin registro ni base de datos."),
                 ("Tecnología", "Interfaz de escritorio desarrollada exclusivamente con Python, tkinter y ttk. Consulta las instrucciones del proyecto y USO_IA.txt para conocer el alcance de la asistencia con IA."),
             ]),
         }
         self.navigation = {}
         for index, (name, screen) in enumerate(self.screens.items(), start=2):
-            screen.grid(row=0, column=0, sticky="nsew")
-            button = ttk.Button(sidebar, text=name, style="Nav.TButton",
+            screen.grid(row=1, column=0, sticky="nsew")
+            button = ttk.Button(sidebar, text=f"0{index - 1}   {name}   →", style="Nav.TButton",
                                 command=lambda key=name: self.navigate(key))
             button.grid(row=index, column=0, sticky="ew", pady=5)
             self.navigation[name] = button
@@ -87,6 +105,7 @@ class RSAApp(tk.Tk):
 
     def navigate(self, name):
         self.close_details()
+        self.breadcrumb.configure(text=f"WORKSPACE / {name.upper()}")
         screen = self.screens[name]
         screen.tkraise()
         for key, button in self.navigation.items():

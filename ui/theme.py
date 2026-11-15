@@ -26,10 +26,18 @@ def configure_theme(root):
     style.configure("Title.TLabel", font=("Segoe UI", 25, "bold"), foreground=CYAN)
     style.configure("Heading.TLabel", font=("Segoe UI", 14, "bold"), foreground=GREEN)
     style.configure("Accent.TLabel", foreground=PURPLE)
+    style.configure("Card.TLabel", background=PANEL, foreground=TEXT)
+    style.configure("CardHeading.TLabel", background=PANEL, foreground=CYAN,
+                    font=("Segoe UI", 14, "bold"))
+    style.configure("Ready.Horizontal.TProgressbar", background=GREEN,
+                    troughcolor=PANEL, bordercolor=BG, lightcolor=GREEN,
+                    darkcolor=GREEN, thickness=4)
     style.configure("TEntry", fieldbackground=PANEL, foreground=TEXT,
                     insertcolor=CYAN, padding=9, bordercolor=MUTED)
     style.map("TEntry", bordercolor=[("focus", CYAN)],
               fieldbackground=[("readonly", PANEL)], foreground=[("readonly", TEXT)])
+    style.configure("Invalid.TEntry", bordercolor=ERROR)
+    style.map("Invalid.TEntry", bordercolor=[("focus", ERROR), ("!focus", ERROR)])
     style.configure("TButton", background=PANEL, foreground=TEXT,
                     padding=(14, 10), borderwidth=2, bordercolor=PANEL)
     style.map("TButton", background=[("disabled", PANEL), ("pressed", "#254552"),
@@ -41,8 +49,9 @@ def configure_theme(root):
                                              ("pressed", "#68D65A"),
                                              ("active", "#8BFF73")],
               foreground=[("disabled", MUTED), ("active", BG)])
-    style.configure("Nav.TButton", anchor="w")
-    style.configure("Selected.Nav.TButton", foreground=CYAN, bordercolor=CYAN)
+    style.configure("Nav.TButton", anchor="w", padding=(16, 16))
+    style.configure("Selected.Nav.TButton", foreground=CYAN, bordercolor=CYAN,
+                    background="#102A35")
     style.configure("TCheckbutton", background=BG, foreground=TEXT, padding=5)
     style.map("TCheckbutton", background=[("active", PANEL)],
               foreground=[("active", CYAN)])

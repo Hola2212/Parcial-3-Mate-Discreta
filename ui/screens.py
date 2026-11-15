@@ -4,8 +4,9 @@ import tkinter as tk
 from tkinter import ttk
 
 from contracts import DecryptRequest, EncryptRequest, PENDING
+from users import authenticate, credentials_help
 from ui import theme as t
-from ui.widgets import ScrollFrame, TextBox
+from ui.widgets import CyberBanner, ScrollFrame, TextBox
 
 
 class LoginScreen(ScrollFrame):
@@ -13,10 +14,11 @@ class LoginScreen(ScrollFrame):
         super().__init__(parent)
         self.app = app
         self.body.columnconfigure(0, weight=1)
-        ttk.Label(self.body, text="RSA / ACCESS", style="Title.TLabel").grid(sticky="w", pady=(35, 12))
-        ttk.Label(self.body, text="Laboratorio de criptografía", style="Heading.TLabel").grid(sticky="w")
+        self.body.bind("<Configure>", self._center_form, add="+")
+        CyberBanner(self.body).grid(sticky="ew", pady=(12, 22))
+        ttk.Label(self.body, text="Bienvenido al laboratorio", style="Heading.TLabel").grid(sticky="w", pady=(0, 8))
         ttk.Label(self.body, text="Acceso de demostración para explorar la interfaz.\n"
-                  "No proporciona autenticación real ni almacena contraseñas.",
+                  "Tres cuentas locales con roles; sin registro ni base de datos.",
                   style="Muted.TLabel", wraplength=460).grid(sticky="w", pady=18)
         ttk.Label(self.body, text="Usuario").grid(sticky="w")
         self.username = ttk.Entry(self.body)
@@ -31,30 +33,46 @@ class LoginScreen(ScrollFrame):
         self.status.grid(sticky="w", pady=10)
         ttk.Button(self.body, text="Ingresar →", style="Primary.TButton",
                    command=self.submit).grid(sticky="ew", pady=8)
-        ttk.Label(self.body, text="Credenciales demo: estudiante / rsa2026",
-                  style="Accent.TLabel").grid(sticky="w", pady=16)
+        ttk.Label(self.body, text="Cuentas de demostración:\n" + credentials_help(),
+                  style="Accent.TLabel", wraplength=480).grid(sticky="w", pady=16)
         for widget in (self.username, self.password):
             widget.bind("<Return>", lambda event: self.submit())
+            widget.bind("<KeyRelease>", lambda event: self.status.configure(text=""))
+
+    def _center_form(self, event):
+        self.body.configure(padding=(max(24, (event.width - 540) // 2), 24))
 
     def submit(self):
         if not self.username.get() or not self.password.get():
             self.status.configure(text="Ingresa el usuario y la contraseña.")
-        elif self.username.get() == "estudiante" and self.password.get() == "rsa2026":
-            self.app.open_session(self.username.get())
-        else:
+            return
+        user = authenticate(self.username.get(), self.password.get())
+        if user is None:
             self.status.configure(text="Credenciales incorrectas. Usa las credenciales de demostración.")
+            return
+        self.app.open_session(user)
 
 
 class InfoScreen(ScrollFrame):
     def __init__(self, parent, title, sections):
         super().__init__(parent)
         self.body.columnconfigure(0, weight=1)
+        CyberBanner(self.body).grid(sticky="ew", pady=(0, 22))
         ttk.Label(self.body, text=title, style="Title.TLabel").grid(sticky="w", pady=(0, 20))
         self.paragraphs = []
-        for heading, text in sections:
-            ttk.Label(self.body, text=heading, style="Heading.TLabel").grid(sticky="w", pady=(16, 6))
-            label = ttk.Label(self.body, text=text, wraplength=640, justify="left")
+        for index, (heading, text) in enumerate(sections, start=1):
+            card = tk.Frame(self.body, bg=t.PANEL, highlightthickness=1,
+                            highlightbackground="#203743", padx=18, pady=14)
+            card.grid(sticky="ew", pady=7)
+            card.columnconfigure(0, weight=1)
+            heading_label = ttk.Label(card, text=f"{index:02d} / {heading}", style="CardHeading.TLabel")
+            heading_label.grid(sticky="w", pady=(0, 8))
+            label = ttk.Label(card, text=text, wraplength=640, justify="left", style="Card.TLabel")
             label.grid(sticky="ew", pady=(0, 10))
+            # La tarjeta reacciona al cursor sin mover el contenido.
+            for widget in (card, heading_label, label):
+                widget.bind("<Enter>", lambda event, target=card: target.configure(highlightbackground=t.CYAN))
+                widget.bind("<Leave>", lambda event, target=card: target.configure(highlightbackground="#203743"))
             self.paragraphs.append(label)
         self.body.bind("<Configure>", self._wrap, add="+")
 
@@ -77,6 +95,8 @@ class OperationScreen(ScrollFrame):
         ttk.Label(self.body, text="Cifrado C" if decrypt else "Mensaje original").grid(sticky="w")
         self.content = TextBox(self.body)
         self.content.grid(sticky="ew", pady=(6, 8))
+        self.input_feedback = ttk.Label(self.body, text="0 caracteres", style="Accent.TLabel")
+        self.input_feedback.grid(sticky="w", pady=(0, 6))
         ttk.Label(self.body, text="Bloques de seis dígitos separados por espacios." if decrypt
                   else "Los espacios iniciales, finales y consecutivos se conservan.",
                   style="Muted.TLabel", wraplength=420).grid(sticky="w", pady=(0, 12))
@@ -96,6 +116,12 @@ class OperationScreen(ScrollFrame):
             entry = ttk.Entry(cell, width=12)
             entry.grid(sticky="ew", pady=5)
             self.entries[key] = entry
+        self.readiness = ttk.Label(self.body, text="Completa las entradas para continuar.",
+                                    style="Muted.TLabel")
+        self.readiness.grid(sticky="w", pady=(8, 4))
+        self.progress = ttk.Progressbar(self.body, maximum=len(keys) + 1,
+                                        style="Ready.Horizontal.TProgressbar", takefocus=False)
+        self.progress.grid(sticky="ew", pady=(0, 6))
         actions = ttk.Frame(self.body)
         actions.grid(sticky="ew", pady=12)
         ttk.Button(actions, text="Desencriptar" if decrypt else "Encriptar",
@@ -140,10 +166,37 @@ class OperationScreen(ScrollFrame):
             entry.input_variable = variable
             variable.trace_add("write", self._input_changed)
         self.content.text.bind("<<Modified>>", self._text_changed)
+        self.content.text.bind("<Control-Return>", self._submit_shortcut)
+        for entry in self.entries.values():
+            entry.bind("<Control-Return>", self._submit_shortcut)
         self.content.text.edit_modified(False)
+        self._update_feedback()
+
+    def _submit_shortcut(self, event):
+        self.request_operation()
+        return "break"
+
+    def _update_feedback(self):
+        content = self.content.get()
+        if self.decrypt:
+            blocks = len(content.split())
+            self.input_feedback.configure(text=f"{len(content)} caracteres · {blocks} bloques ingresados")
+        else:
+            self.input_feedback.configure(text=f"{len(content)} caracteres · espacios incluidos")
+        ready = int(content != "")
+        for entry in self.entries.values():
+            raw = entry.get()
+            valid = bool(re.fullmatch(r"[+-]?[0-9]+", raw))
+            ready += valid
+            entry.configure(style="Invalid.TEntry" if raw and not valid else "TEntry")
+        total = len(self.entries) + 1
+        self.progress.configure(value=ready)
+        self.readiness.configure(text=f"{ready}/{total} campos con formato básico · Ctrl+Enter para enviar",
+                                 foreground=t.GREEN if ready == total else t.MUTED)
 
     def _input_changed(self, *args):
         self.reset_results()
+        self._update_feedback()
         self.status.configure(text=PENDING, foreground=t.WARNING)
 
     def _text_changed(self, event):

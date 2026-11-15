@@ -5,6 +5,57 @@ from tkinter import ttk
 from ui import theme as t
 
 
+class CyberBanner(tk.Canvas):
+    """Cabecera vectorial ligera con un pulso decorativo y respuesta al cursor."""
+    def __init__(self, parent):
+        super().__init__(parent, height=104, bg=t.PANEL, highlightthickness=1,
+                         highlightbackground="#203743", takefocus=False)
+        self.phase = 0
+        self.hovered = False
+        self.timer = None
+        self.bind("<Configure>", lambda event: self.draw())
+        self.bind("<Enter>", lambda event: self.hover(True))
+        self.bind("<Leave>", lambda event: self.hover(False))
+        self.bind("<Destroy>", self.stop)
+        self.animate()
+
+    def hover(self, active):
+        self.hovered = active
+        self.configure(highlightbackground=t.CYAN if active else "#203743")
+        self.draw()
+
+    def draw(self):
+        self.delete("all")
+        width = self.winfo_width()
+        for x in range(0, width, 32):
+            self.create_line(x, 0, x, 104, fill="#152833")
+        for y in range(8, 104, 24):
+            self.create_line(0, y, width, y, fill="#152833")
+        self.create_polygon(30, 22, 52, 14, 74, 22, 70, 56, 52, 72, 34, 56,
+                            outline=t.CYAN if self.hovered else t.GREEN,
+                            fill="#102624", width=2)
+        self.create_text(52, 42, text="R", fill=t.GREEN, font=("Consolas", 21, "bold"))
+        self.create_text(94, 34, text="RSA / CRYPTO LAB", anchor="w", fill=t.TEXT,
+                         font=("Consolas", 15, "bold"))
+        self.create_text(94, 62, text="PYTHON  ·  MATEMÁTICA DISCRETA", anchor="w",
+                         fill=t.CYAN, font=("Consolas", 10))
+        self.create_line(20, 88, max(20, width - 20), 88, fill="#254552", width=2)
+        point = 20 + (self.phase % 100) / 100 * max(1, width - 40)
+        self.create_line(max(20, point - 45), 88, point, 88, fill=t.CYAN, width=2)
+        self.create_oval(point - 3, 85, point + 3, 91, fill=t.GREEN, outline="")
+
+    def animate(self):
+        if self.winfo_ismapped():
+            self.phase += 2
+            self.draw()
+        self.timer = self.after(80, self.animate)
+
+    def stop(self, event):
+        if event.widget is self and self.timer is not None:
+            self.after_cancel(self.timer)
+            self.timer = None
+
+
 class ScrollFrame(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -31,7 +82,7 @@ class ScrollFrame(ttk.Frame):
     def _bind_wheel(self, event):
         def attach(widget):
             if not isinstance(widget, (tk.Text, ttk.Treeview)):
-                widget.bind("<MouseWheel>", self._wheel, add="+")
+                widget.bind("<MouseWheel>", self._wheel)
                 widget.bind("<Button-4>", lambda e: self.canvas.yview_scroll(-1, "units"))
                 widget.bind("<Button-5>", lambda e: self.canvas.yview_scroll(1, "units"))
             for child in widget.winfo_children():

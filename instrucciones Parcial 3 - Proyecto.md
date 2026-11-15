@@ -10,6 +10,7 @@ validaciones de formato, salidas seleccionables y una ventana auxiliar de detall
 Parcial_3_Proyecto/
 ├── main.py
 ├── contracts.py
+├── users.py
 ├── instrucciones Parcial 3 - Proyecto.md
 ├── .gitignore
 ├── USO_IA.txt
@@ -36,11 +37,29 @@ python main.py
 ```
 
 También puedes ejecutar `python Parcial_3_Proyecto/main.py` desde la carpeta superior.
-Ingresa con usuario `estudiante` y contraseña `rsa2026`. Enter permite enviar el
-formulario de acceso. Este login solo demuestra navegación y no autentica usuarios
-reales ni almacena contraseñas. Cerrar sesión elimina los formularios de la sesión.
+Hay tres cuentas locales de demostración:
+
+| Usuario | Contraseña | Rol |
+| --- | --- | --- |
+| `estudiante1` | `rsa2026` | Estudiante |
+| `estudiante2` | `rsa2026` | Estudiante |
+| `admin` | `admin2026` | Administrador |
+
+Enter permite enviar el formulario de acceso. El usuario y su rol se muestran
+durante la sesión. Las tres cuentas acceden a las mismas funciones actuales;
+no se han definido permisos exclusivos del administrador. Las credenciales de
+demostración están en `users.py`, sin registro ni base de datos. No son un sistema
+de autenticación de producción. Cerrar sesión limpia la identidad y los formularios.
 
 ## Uso
+
+La ventana abre centrada al 80% del ancho y del alto de la pantalla, sin forzar
+pantalla completa ni maximización. Puedes redimensionarla libremente.
+La cabecera tiene una animación decorativa y las tarjetas y botones reaccionan
+al cursor. Los formularios muestran contadores de caracteres, progreso de campos
+y resaltado de enteros con formato incorrecto mientras escribes. Este progreso
+solo indica formato básico, no verifica la validez matemática de los parámetros.
+Usa Ctrl+Enter dentro de las entradas para solicitar la operación.
 
 - **Inicio:** presenta las funcionalidades y el estado de desarrollo.
 - **Encriptar:** recibe el mensaje original y p, q, e. Prepara salidas para C, L,
