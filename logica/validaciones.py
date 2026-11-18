@@ -21,3 +21,15 @@ def validar_parametros(p, q, e):
     if mcd_euclides(e, phi) != 1:
         raise ValueError("e y phi deben ser primos relativos.")
     return n, phi
+
+def validar_mensaje(mensaje):
+    if not isinstance(mensaje, str):
+        raise TypeError("El mensaje debe ser una cadena de texto.")
+    if mensaje == "": raise ValueError("El mensaje no puede estar vacío.")
+    
+    for pos, car in enumerate(mensaje, start=1):
+        if not 32 <= ord(car) <= 126:
+            raise ValueError(
+                f"Carácter no permitido en la posición {pos}: "
+                f"{car!r}. Solo se admite ASCII del 32 al 126."
+            )
