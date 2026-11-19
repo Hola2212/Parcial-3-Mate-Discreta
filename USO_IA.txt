@@ -8,7 +8,6 @@ resultados y los puntos de integración con un futuro módulo matemático.
 
 La asistencia descrita no incluyó la implementación de primalidad, máximo
 común divisor, inverso modular, exponenciación modular ni operaciones RSA.
-Estas funcionalidades no están implementadas en esta versión.
 
 Referencia sugerida:
 OpenAI. (2026). ChatGPT - CODEX [Herramienta de inteligencia artificial generativa].
