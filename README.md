@@ -1,10 +1,16 @@
 # Parcial 3 - Proyecto RSA
 
+## Juan Pablo Flores Chávez y Zabdi Soham Pelicó Hernández
+
+### Grupo 13
+
 Proyecto de Matemática Discreta 1 (MM2015) para encriptar y desencriptar mensajes mediante RSA, desarrollado en Python con una interfaz gráfica en tkinter y ttk.
 
 La ventana inicia centrada al 80% del ancho y alto de la pantalla y puede redimensionarse. La interfaz incluye acentos neón, una cabecera animada, tarjetas reactivas y contadores de entrada en tiempo real.
 
 Para iniciar la aplicación:
+
+Se recomienda Python 3.11.15
 
 ```bash
 python main.py
