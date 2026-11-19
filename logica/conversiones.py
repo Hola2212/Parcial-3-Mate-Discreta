@@ -41,3 +41,14 @@ def bloques_a_mensaje(bloques: list[int], longitud: int) -> str:
         
         mensaje = mensaje[:-1]
     return mensaje
+
+def formatear_cifrado(bloques):
+    if not isinstance(bloques, list): raise TypeError("Los bloques deben proporcionarse como una lista.")
+    if not bloques: raise ValueError("Debe existir al menos un bloque cifrado.")
+    
+    bloques_formateados = []
+    for posicion, bloque in enumerate(bloques, start=1):
+        if type(bloque) is not int: raise TypeError(f"El bloque {posicion} debe ser un entero.")
+        if not 0 <= bloque <= 999999: raise ValueError(f"El bloque {posicion} debe estar entre 0 y 999999")
+        bloques_formateados.append(f"{bloque:06d}")
+    return " ".join(bloques_formateados)
