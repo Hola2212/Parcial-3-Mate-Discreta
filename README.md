@@ -2,8 +2,6 @@
 
 Proyecto de Matemática Discreta 1 (MM2015) para encriptar y desencriptar mensajes mediante RSA, desarrollado en Python con una interfaz gráfica en tkinter y ttk.
 
-Actualmente incluye un login de demostración, navegación, formularios de encriptación y desencriptación y una ventana de detalles. La lógica matemática RSA está pendiente de integración.
-
 La ventana inicia centrada al 80% del ancho y alto de la pantalla y puede redimensionarse. La interfaz incluye acentos neón, una cabecera animada, tarjetas reactivas y contadores de entrada en tiempo real.
 
 Para iniciar la aplicación:
