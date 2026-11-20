@@ -89,6 +89,8 @@ class OperationScreen(ScrollFrame):
         self.operation = "Desencriptación" if decrypt else "Encriptación"
         self.details = []
         self.result = None
+        self.mostrar_privados = tk.BooleanVar(value=False)
+        self.campos_privados = []
         self.body.columnconfigure(0, weight=1)
         ttk.Label(self.body, text=self.operation, style="Title.TLabel").grid(sticky="w")
         ttk.Label(self.body, text="01 / ENTRADAS", style="Heading.TLabel").grid(sticky="w", pady=(22, 12))
@@ -113,9 +115,25 @@ class OperationScreen(ScrollFrame):
             cell.grid(row=row, column=column, sticky="ew")
             cell.columnconfigure(0, weight=1)
             ttk.Label(cell, text=label).grid(sticky="w")
-            entry = ttk.Entry(cell, width=12)
+            es_privado = key in ("p", "q")
+            entry = ttk.Entry(
+                cell,
+                width=12,
+                show="*" if es_privado else "",
+            )
             entry.grid(sticky="ew", pady=5)
+            
             self.entries[key] = entry
+            if es_privado:
+                self.campos_privados.append(entry)
+            
+        ttk.Checkbutton(
+            self.body,
+            text="Mostrar datos privados (p, q, phi y d)",
+            variable=self.mostrar_privados,
+            command=self._alternar_privados,
+        ).grid(sticky="w", pady=(8, 4))
+        
         self.readiness = ttk.Label(self.body, text="Completa las entradas para continuar.",
                                     style="Muted.TLabel")
         self.readiness.grid(sticky="w", pady=(8, 4))
@@ -145,7 +163,18 @@ class OperationScreen(ScrollFrame):
         for key, label in results:
             ttk.Label(self.body, text=label).grid(sticky="w", pady=(8, 2))
             value = tk.StringVar(value="")
-            ttk.Entry(self.body, textvariable=value, state="readonly").grid(sticky="ew")
+            
+            es_privado = key in ("phi", "d")
+            campo = ttk.Entry(
+                self.body,
+                textvariable=value,
+                state="readonly",
+                show="*" if es_privado else "",
+            )
+            campo.grid(sticky="ew")
+            if es_privado:
+                self.campos_privados.append(campo)
+            
             self.values[key] = value
         copies = ttk.Frame(self.body)
         copies.grid(sticky="ew", pady=16)
@@ -274,6 +303,11 @@ class OperationScreen(ScrollFrame):
         self.reset_results()
         self.status.configure(text=message, foreground=t.ERROR)
 
+    def _alternar_privados(self):
+        mascara = "" if self.mostrar_privados.get() else "*"
+        for campo in self.campos_privados:
+            campo.configure(show=mascara)
+    
     def clear(self):
         self.content.set("")
         for entry in self.entries.values():
@@ -281,6 +315,8 @@ class OperationScreen(ScrollFrame):
         self.reset_results()
         self.status.configure(text=PENDING, foreground=t.WARNING)
         self.content.text.focus_set()
+        self.mostrar_privados.set(False)
+        self._alternar_privados()
 
     def copy(self, value):
         if self.result is None:
