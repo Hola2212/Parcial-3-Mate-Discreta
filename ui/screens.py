@@ -87,6 +87,11 @@ class OperationScreen(ScrollFrame):
         self.app = app
         self.decrypt = decrypt
         self.operation = "Desencriptación" if decrypt else "Encriptación"
+        self.mensaje_inicial = (
+            "Ingresa el cifrado, la longitud original y los parámetros RSA."
+            if decrypt
+            else "Ingresa el mensaje y los parámetros RSA."
+        )
         self.details = []
         self.result = None
         self.mostrar_privados = tk.BooleanVar(value=False)
@@ -145,8 +150,13 @@ class OperationScreen(ScrollFrame):
         ttk.Button(actions, text="Desencriptar" if decrypt else "Encriptar",
                    style="Primary.TButton", command=self.request_operation).grid(row=0, column=0, padx=(0, 10))
         ttk.Button(actions, text="Limpiar", command=self.clear).grid(row=0, column=1)
-        self.status = ttk.Label(self.body, text=PENDING, foreground=t.WARNING,
-                                wraplength=420, justify="left")
+        self.status = ttk.Label(
+            self.body,
+            text=self.mensaje_inicial,
+            foreground=t.MUTED,
+            wraplength=420,
+            justify="left",
+        )
         self.status.grid(sticky="ew", pady=8)
         self.body.bind("<Configure>", lambda event: self.status.configure(
             wraplength=max(180, event.width - 60)), add="+")
@@ -226,7 +236,10 @@ class OperationScreen(ScrollFrame):
     def _input_changed(self, *args):
         self.reset_results()
         self._update_feedback()
-        self.status.configure(text=PENDING, foreground=t.WARNING)
+        self.status.configure(
+            text=self.mensaje_inicial,
+            foreground=t.MUTED,
+        )
 
     def _text_changed(self, event):
         if self.content.text.edit_modified():
