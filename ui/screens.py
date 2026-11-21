@@ -87,8 +87,15 @@ class OperationScreen(ScrollFrame):
         self.app = app
         self.decrypt = decrypt
         self.operation = "Desencriptación" if decrypt else "Encriptación"
+        self.mensaje_inicial = (
+            "Ingresa el cifrado, la longitud original y los parámetros RSA."
+            if decrypt
+            else "Ingresa el mensaje y los parámetros RSA."
+        )
         self.details = []
         self.result = None
+        self.mostrar_privados = tk.BooleanVar(value=False)
+        self.campos_privados = []
         self.body.columnconfigure(0, weight=1)
         ttk.Label(self.body, text=self.operation, style="Title.TLabel").grid(sticky="w")
         ttk.Label(self.body, text="01 / ENTRADAS", style="Heading.TLabel").grid(sticky="w", pady=(22, 12))
@@ -113,9 +120,25 @@ class OperationScreen(ScrollFrame):
             cell.grid(row=row, column=column, sticky="ew")
             cell.columnconfigure(0, weight=1)
             ttk.Label(cell, text=label).grid(sticky="w")
-            entry = ttk.Entry(cell, width=12)
+            es_privado = key in ("p", "q")
+            entry = ttk.Entry(
+                cell,
+                width=12,
+                show="*" if es_privado else "",
+            )
             entry.grid(sticky="ew", pady=5)
+            
             self.entries[key] = entry
+            if es_privado:
+                self.campos_privados.append(entry)
+            
+        ttk.Checkbutton(
+            self.body,
+            text="Mostrar datos privados (p, q, phi y d)",
+            variable=self.mostrar_privados,
+            command=self._alternar_privados,
+        ).grid(sticky="w", pady=(8, 4))
+        
         self.readiness = ttk.Label(self.body, text="Completa las entradas para continuar.",
                                     style="Muted.TLabel")
         self.readiness.grid(sticky="w", pady=(8, 4))
@@ -127,8 +150,13 @@ class OperationScreen(ScrollFrame):
         ttk.Button(actions, text="Desencriptar" if decrypt else "Encriptar",
                    style="Primary.TButton", command=self.request_operation).grid(row=0, column=0, padx=(0, 10))
         ttk.Button(actions, text="Limpiar", command=self.clear).grid(row=0, column=1)
-        self.status = ttk.Label(self.body, text=PENDING, foreground=t.WARNING,
-                                wraplength=420, justify="left")
+        self.status = ttk.Label(
+            self.body,
+            text=self.mensaje_inicial,
+            foreground=t.MUTED,
+            wraplength=420,
+            justify="left",
+        )
         self.status.grid(sticky="ew", pady=8)
         self.body.bind("<Configure>", lambda event: self.status.configure(
             wraplength=max(180, event.width - 60)), add="+")
@@ -145,7 +173,18 @@ class OperationScreen(ScrollFrame):
         for key, label in results:
             ttk.Label(self.body, text=label).grid(sticky="w", pady=(8, 2))
             value = tk.StringVar(value="")
-            ttk.Entry(self.body, textvariable=value, state="readonly").grid(sticky="ew")
+            
+            es_privado = key in ("phi", "d")
+            campo = ttk.Entry(
+                self.body,
+                textvariable=value,
+                state="readonly",
+                show="*" if es_privado else "",
+            )
+            campo.grid(sticky="ew")
+            if es_privado:
+                self.campos_privados.append(campo)
+            
             self.values[key] = value
         copies = ttk.Frame(self.body)
         copies.grid(sticky="ew", pady=16)
@@ -197,7 +236,10 @@ class OperationScreen(ScrollFrame):
     def _input_changed(self, *args):
         self.reset_results()
         self._update_feedback()
-        self.status.configure(text=PENDING, foreground=t.WARNING)
+        self.status.configure(
+            text=self.mensaje_inicial,
+            foreground=t.MUTED,
+        )
 
     def _text_changed(self, event):
         if self.content.text.edit_modified():
@@ -274,6 +316,11 @@ class OperationScreen(ScrollFrame):
         self.reset_results()
         self.status.configure(text=message, foreground=t.ERROR)
 
+    def _alternar_privados(self):
+        mascara = "" if self.mostrar_privados.get() else "*"
+        for campo in self.campos_privados:
+            campo.configure(show=mascara)
+    
     def clear(self):
         self.content.set("")
         for entry in self.entries.values():
@@ -281,6 +328,8 @@ class OperationScreen(ScrollFrame):
         self.reset_results()
         self.status.configure(text=PENDING, foreground=t.WARNING)
         self.content.text.focus_set()
+        self.mostrar_privados.set(False)
+        self._alternar_privados()
 
     def copy(self, value):
         if self.result is None:

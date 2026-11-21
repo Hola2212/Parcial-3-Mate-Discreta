@@ -1,4 +1,3 @@
-"""Punto de entrada: python main.py."""
 from ui.app import RSAApp
 from rsa_service import RealRSAService
 

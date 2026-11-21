@@ -77,8 +77,16 @@ class RSAApp(tk.Tk):
             "Inicio": InfoScreen(content, "Laboratorio RSA", [
                 ("Explora el proyecto", "Utiliza el menú para ingresar los datos de cada operación y consultar sus resultados."),
                 ("Encriptar", "Prepara un mensaje y los parámetros p, q y e. La pantalla dispone de salidas para C, L y la llave pública."),
-                ("Desencriptar", "Ingresa C, L y los parámetros RSA para recuperar el mensaje cuando se conecte la lógica matemática."),
-                ("Estado del desarrollo", "La navegación y los formularios están disponibles. Lógica RSA pendiente de integrar. No se generan resultados simulados."),
+                (
+                    "Desencriptar",
+                    "Ingresa C, L y los parámetros RSA para recuperar exactamente "
+                    "el mensaje original, incluidos sus espacios.",
+                ),
+                (
+                    "Estado del proyecto",
+                    "La interfaz está conectada con los algoritmos RSA. "
+                    "Puedes encriptar, desencriptar y consultar los detalles del proceso.",
+                ),
             ]),
             "Encriptar": OperationScreen(content, self),
             "Desencriptar": OperationScreen(content, self, decrypt=True),
@@ -86,10 +94,27 @@ class RSAApp(tk.Tk):
                 ("Encriptación", "Requiere mensaje original, p, q y e. Los caracteres admitidos por el proyecto son ASCII imprimibles del 32 al 126. Tildes, ñ, tabulaciones y saltos de línea no están admitidos."),
                 ("Desencriptación", "Requiere C, longitud original L, p, q y e. Conserva C y L juntos. Cada bloque de C tiene seis dígitos y se separa del siguiente por espacios."),
                 ("Relleno y espacios", "Cuando el mensaje tiene longitud impar, RSA debe añadir exactamente un espacio final. Al recuperar el mensaje se retira solo ese relleno. Los espacios originales iniciales, finales y consecutivos se conservan."),
-                ("Validaciones", "Esta interfaz comprueba campos obligatorios y formatos enteros y del cifrado. La validación matemática, la coherencia de L y los caracteres admitidos corresponden al futuro servicio RSA."),
-                ("Detalles del proceso", "La ventana auxiliar mostrará caracteres, ASCII y bloques recibidos del servicio matemático. Sin el servicio conectado permanece vacía."),
+                (
+                    "Validaciones",
+                    "El programa comprueba los parámetros RSA, los caracteres ASCII "
+                    "admitidos, el formato y rango del cifrado, la coherencia de L "
+                    "y el relleno recuperado.",
+                ),
+                (
+                    "Detalles del proceso",
+                    "Después de ejecutar una operación, abre los detalles para consultar "
+                    "los caracteres, sus códigos ASCII y los bloques de entrada y salida. "
+                    "Los espacios se representan de forma visible en la tabla.",
+                ),
                 ("Acceso de demostración", credentials_help() + "\nLas tres cuentas permiten explorar las mismas funciones. El rol identifica la sesión; no se han definido permisos adicionales. Las credenciales son públicas y locales, sin registro ni base de datos."),
                 ("Tecnología", "Interfaz de escritorio desarrollada exclusivamente con Python, tkinter y ttk. Consulta las instrucciones del proyecto y USO_IA.txt para conocer el alcance de la asistencia con IA."),
+                (
+                    "Datos privados",
+                    "Los parámetros p, q, phi y el exponente privado d están ocultos "
+                    "inicialmente. Activa Mostrar datos privados para consultarlos. "
+                    "Este control cambia su visibilidad; no asigna claves propias "
+                    "a cada usuario.",
+                ),
             ]),
         }
         self.navigation = {}
