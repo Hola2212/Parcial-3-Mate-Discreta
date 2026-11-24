@@ -1,17 +1,25 @@
 DECLARACIÓN DE USO DE INTELIGENCIA ARTIFICIAL
 
-Se utilizó ChatGPT (OpenAI), mediante Codex, como apoyo durante el
-desarrollo y la revisión del proyecto en noviembre de 2026.
+Se utilizó ChatGPT (OpenAI), mediante Codex, como apoyo durante el desarrollo
+y revisión del proyecto en noviembre de 2026.
 
-La asistencia incluyó diseño de la interfaz Tkinter/ttk, preparación
-de las operaciones RSA, integración del servicio con contracts.py,
-preparación de los detalles de las tablas, pruebas automatizadas,
-orientación para resolver problemas de integración y Git, revisión
-de documentación y preparación del video demostrativo.
+El alcance incluyó asistencia para diseñar la interfaz Tkinter/ttk, preparar
+operaciones RSA, conectar el servicio con contracts.py, generar filas de
+detalle, preparar pruebas, revisar documentación y resolver dudas de Git.
 
-La revisión final incluyó ajustes a la primalidad y exponenciación
-modular, validación temprana del módulo y conversión de enteros extensos.
+Tras la nueva solicitud de revisión mediante un enlace público, la asistencia
+incluyó una interfaz Streamlit que reutiliza RealRSAService y los algoritmos
+Python del proyecto. Se añadieron ejemplos, transferencia de C/L/parámetros,
+pruebas del flujo web e instrucciones de despliegue. Se ajustó la primalidad
+para usar comparaciones enteras, se comprobó n antes de las pruebas costosas
+y se hizo iterativa la exponenciación modular para evitar errores de recursión.
 
+La versión web usa Streamlit como dependencia de interfaz; no utiliza
+bibliotecas criptográficas ni sustitutos de los algoritmos solicitados.
+Las pruebas de flujo simulan únicamente el estado de sesión; la comprobación
+visual y la publicación deben realizarse en el equipo o cuenta del grupo.
+
+Los integrantes son responsables de revisar y comprender el código entregado.
 
 Referencia:
 OpenAI. (2026). ChatGPT - Codex

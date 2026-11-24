@@ -6,12 +6,37 @@
 - Zabdi Soham Pelicó Hernández.
 - Grupo 14.
 
-## Requisitos y ejecución
+## Versión web para la revisión en línea
+
+La entrada pública es **`streamlit_app.py`**, implementada con Streamlit y el
+mismo `RealRSAService` del proyecto. No requiere login. Permite encriptar,
+desencriptar, consultar n, phi, d, L, relleno, ASCII y tablas de bloques.
+Incluye ejemplos y transferencia de C, L y parámetros entre operaciones.
+
+Para ejecutar localmente (solo los desarrolladores):
+
+```bash
+python -m pip install -r requirements.txt
+python -m streamlit run streamlit_app.py
+```
+
+Python recomendado para la versión web: **3.12**. `requirements.txt` fija
+Streamlit 1.51.0. No hay bibliotecas externas de criptografía.
+
+Para publicarla y obtener la URL que se entrega al profesor, seguir
+**`PUBLICAR_WEB.md`**. El profesor solo abre la URL pública del despliegue:
+no instala Python ni dependencias. La dirección localhost no es pública.
+La URL definitiva se obtiene después del despliegue; no se incluye una inventada.
+
+La interfaz Tkinter original sigue disponible mediante `python main.py`.
+Las cuentas descritas abajo corresponden únicamente a esa versión de escritorio.
+
+## Versión de escritorio: requisitos y ejecución
 
 Python 3.10 o posterior, con Tkinter instalado.
 
-Solo se utiliza la biblioteca estándar de Python. No se necesitan paquetes
-externos ni instalación mediante pip.
+La versión de escritorio utiliza la biblioteca estándar y Tkinter.
+La versión web utiliza además Streamlit, declarado en requirements.txt.
 
 1. Extraer completamente el ZIP.
 2. Abrir una terminal en la carpeta que contiene main.py.
@@ -25,8 +50,8 @@ En Windows también puede usarse `py main.py`; en Linux/macOS,
 Tkinter normalmente se incluye con Python en Windows. En Ubuntu/Debian,
 si falta, instalar el paquete de sistema `python3-tk`.
 
-La aplicación necesita una sesión de escritorio. No necesita Internet ni
-recursos externos y no utiliza rutas absolutas.
+La interfaz Tkinter necesita una sesión de escritorio; la web funciona en el
+navegador. La lógica RSA no utiliza rutas absolutas ni recursos externos.
 
 ## Acceso de demostración
 
@@ -125,6 +150,7 @@ L = 4 recupera "RSA ", mientras que con L = 3 recupera "RSA".
 | logica/algoritmos.py: mcd_euclides | Máximo común divisor mediante Euclides |
 | logica/algoritmos.py: bezout e inverso_modular | Euclides extendido e inverso modular |
 | logica/algoritmos.py: exponenciacion_modular | Exponenciación binaria iterativa |
+| streamlit_app.py | Interfaz pública en el navegador |
 | logica/validaciones.py | Validaciones de parámetros, mensaje, C y L |
 | logica/conversiones.py | Parejas ASCII, relleno y formato del cifrado |
 | logica/operaciones.py | Encriptación y desencriptación |
@@ -144,7 +170,7 @@ Desde la carpeta que contiene main.py:
 
     python -m unittest discover -s tests -v
 
-La revisión incluye 29 pruebas de lógica y servicio. Se comprueban:
+La versión web incluye 32 pruebas de lógica, servicio y flujo de datos. Se comprueban:
 
 - El ejemplo oficial y los ceros iniciales del cifrado.
 - Mensajes pares e impares.
@@ -158,9 +184,17 @@ La revisión incluye 29 pruebas de lógica y servicio. Se comprueban:
 - Exponentes válidos grandes y conversiones decimales extensas.
 
 Las pruebas automáticas no sustituyen la revisión visual de la interfaz.
+Las ocho pruebas de flujo web simulan el estado de Streamlit y ejecutan el
+servicio real; no prueban la instalación de Streamlit ni el navegador.
+En el entorno de preparación no se pudo instalar Streamlit por restricciones
+de acceso al índice de paquetes. Verificar la apertura real al probar localmente
+o publicar, siguiendo PUBLICAR_WEB.md.
 
-## Video y entrega
+## Entrega
 
-El enlace accesible estará en ENLACE_VIDEO.txt.
+Para la nueva revisión solicitada por el profesor se entrega únicamente la URL
+pública de la aplicación funcionando. La publicación aún debe realizarse desde
+la cuenta de Streamlit/GitHub del equipo. El video corresponde a la entrega
+anterior y no sustituye el enlace de la aplicación.
 
 La asistencia con inteligencia artificial se describe en USO_IA.txt.

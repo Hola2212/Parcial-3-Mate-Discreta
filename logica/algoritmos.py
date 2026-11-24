@@ -3,10 +3,10 @@ def es_primo(n):
     if n == 2: return True
     if n%2 == 0: return False
     
-    limite = int(n**0.5) + 1
-    
-    for i in range(3, limite, 2):
+    i = 3
+    while i * i <= n:
         if n % i == 0: return False
+        i += 2
     return True
 
 def mcd_euclides(a,b):
@@ -50,10 +50,16 @@ def exponenciacion_modular(b, e, n):
         raise ValueError("La base y el exponente deben ser mayores o iguales a cero")
     
     if n < 2: raise ValueError("El módulo debe ser al menos 2")
-    if e == 0: return 1
-    if e == 1: return b % n
-    if e % 2 == 1: return (b * (exponenciacion_modular(b, e//2, n)**2)) % n
-    return (exponenciacion_modular(b, e//2, n)**2) % n
+    # Binaria iterativa: reduce cada producto y admite exponentes grandes
+    # sin depender del límite de recursión de Python.
+    resultado = 1
+    factor = b % n
+    while e:
+        if e % 2:
+            resultado = (resultado * factor) % n
+        factor = (factor * factor) % n
+        e //= 2
+    return resultado
 
 def inverso_modular(e,phi):
     if type(e) is not int or type(phi) is not int:
